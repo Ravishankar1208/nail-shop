@@ -11,7 +11,7 @@ const seedAdmin = async () => {
 
     await mongoose.connect(env.MONGO_URI);
 
-    const email = process.env.ADMIN_EMAIL || 'admin@nailatelier.com';
+    const email = process.env.ADMIN_EMAIL?.trim() || 'admin@nailatelier.com';
     const name = process.env.ADMIN_NAME || 'Nail Atelier Admin';
 
     let admin = await User.findOne({ email: email.toLowerCase() });

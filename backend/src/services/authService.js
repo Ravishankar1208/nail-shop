@@ -40,7 +40,8 @@ export const loginUser = async ({ email, password }) => {
     throw error;
   }
 
-  const user = await User.findOne({ email: email.toLowerCase() });
+  const normalizedEmail = email.toLowerCase().trim();
+  const user = await User.findOne({ email: normalizedEmail });
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
     const error = new Error('Invalid email or password');

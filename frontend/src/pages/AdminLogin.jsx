@@ -52,11 +52,26 @@ function AdminLogin() {
         <form onSubmit={handleSubmit} className="auth-form">
           <label>
             Email
-            <input type="email" name="email" value={formData.email} onChange={handleChange} required />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="admin@nailatelier.com"
+              autoComplete="username"
+              required
+            />
           </label>
           <label>
             Password
-            <input type="password" name="password" value={formData.password} onChange={handleChange} required />
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              autoComplete="current-password"
+              required
+            />
           </label>
           {error && <div className="auth-error">{error}</div>}
           <button type="submit" className="btn" disabled={isSubmitting}>
