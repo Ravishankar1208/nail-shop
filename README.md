@@ -25,6 +25,6 @@ The backend uses a local `.env` file with:
 - JWT_SECRET=your_secret
 - CLIENT_URL=http://localhost:5173
 
-The frontend uses:
+The frontend uses this API origin; the API service appends `/api`:
 
-- VITE_API_URL=http://localhost:5000/api
+- VITE_API_URL=https://nail-shop-y0hs.onrender.com
