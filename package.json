@@ -1,0 +1,9 @@
+{
+  "name": "nail-shop-root",
+  "private": true,
+  "scripts": {
+    "frontend": "npm --prefix frontend run dev",
+    "backend": "npm --prefix backend run dev",
+    "install:all": "npm install --prefix frontend && npm install --prefix backend"
+  }
+}
