@@ -9,11 +9,12 @@ const errorHandler = (err, req, res, next) => {
     err.statusCode ||
     err.status ||
     (res.statusCode && res.statusCode !== 200 ? res.statusCode : 500);
+  const isProduction = process.env.NODE_ENV === 'production';
 
   res.status(statusCode).json({
     success: false,
-    message: err.message || 'Server error',
-    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
+    message: isProduction && statusCode >= 500 ? 'Server error' : err.message || 'Server error',
+    stack: isProduction ? undefined : err.stack,
   });
 };
 

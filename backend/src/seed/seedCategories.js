@@ -39,15 +39,19 @@ const seedCategories = async () => {
   try {
     await mongoose.connect(env.MONGO_URI);
 
-    const existing = await Category.countDocuments();
-    if (existing === 0) {
-      await Category.insertMany(categories);
-      console.log('Category seed data inserted:', categories.length);
-    } else {
-      console.log('Categories already exist, skipping seed.');
-    }
+    const operations = categories.map((category) => ({
+      updateOne: {
+        filter: { slug: category.slug },
+        update: { $setOnInsert: category },
+        upsert: true,
+      },
+    }));
+    const result = await Category.bulkWrite(operations, { ordered: false });
+
+    console.log(`Inserted ${result.upsertedCount} missing sample category(ies).`);
   } catch (error) {
     console.error('Category seed error:', error.message);
+    process.exitCode = 1;
   } finally {
     await mongoose.disconnect();
   }

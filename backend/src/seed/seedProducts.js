@@ -243,11 +243,20 @@ const seedProducts = [
 const seedDatabase = async () => {
   try {
     await mongoose.connect(env.MONGO_URI);
-    await Product.deleteMany({});
-    await Product.insertMany(seedProducts);
-    console.log('Sample product data inserted successfully');
+
+    const operations = seedProducts.map((product) => ({
+      updateOne: {
+        filter: { slug: product.slug },
+        update: { $setOnInsert: product },
+        upsert: true,
+      },
+    }));
+    const result = await Product.bulkWrite(operations, { ordered: false });
+
+    console.log(`Inserted ${result.upsertedCount} missing sample product(s).`);
   } catch (error) {
     console.error('Seed error:', error.message);
+    process.exitCode = 1;
   } finally {
     await mongoose.disconnect();
   }

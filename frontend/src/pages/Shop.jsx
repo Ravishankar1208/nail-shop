@@ -59,6 +59,9 @@ function Shop() {
         const data = await getProducts();
         if (mounted) setProducts(data);
       } catch (err) {
+        if (import.meta.env.DEV) {
+          console.error('Failed to load products:', err);
+        }
         if (mounted) setError('Unable to load products. Please try again.');
       } finally {
         if (mounted) setLoading(false);
