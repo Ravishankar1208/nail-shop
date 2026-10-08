@@ -12,6 +12,7 @@ import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 const app = express();
 const allowedOrigins = new Set([
   env.CLIENT_URL,
+  'https://nail-shop-phi.vercel.app',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000',

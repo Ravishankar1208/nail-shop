@@ -18,13 +18,17 @@ npm --prefix backend run dev
 
 ## Environment
 
-The backend uses a local `.env` file with:
+The backend uses `backend/.env` with private database and signing credentials. Set
+`CLIENT_URL` to the deployed frontend origin in production; it defaults to the
+Vercel frontend and localhost origins remain allowed for development.
 
-- PORT=5000
-- MONGO_URI=mongodb://127.0.0.1:27017/nailshop
-- JWT_SECRET=your_secret
-- CLIENT_URL=http://localhost:5173
+The frontend uses `VITE_API_URL` as the backend origin. The API service adds
+`/api` exactly once, so configure the origin without `/api`:
 
-The frontend uses this API origin; the API service appends `/api`:
+- Production: `https://nail-shop-y0hs.onrender.com`
+- Local development: `http://localhost:5000`
 
-- VITE_API_URL=http://localhost:5000
+The production frontend value is in `frontend/.env.production`. For local
+development, copy `frontend/.env.example` to `frontend/.env.local`. Vite loads
+`.env.local` for local runs, and it is git-ignored. Never put backend secrets in
+frontend environment files.

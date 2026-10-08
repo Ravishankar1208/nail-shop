@@ -1,8 +1,12 @@
 import axios from 'axios';
 
-const apiOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:5000')
-  .replace(/\/+$/, '');
-const apiBaseUrl = apiOrigin.endsWith('/api') ? apiOrigin : `${apiOrigin}/api`;
+const configuredApiOrigin = import.meta.env.VITE_API_URL?.trim();
+if (!configuredApiOrigin) {
+  throw new Error('VITE_API_URL must be set to the backend origin.');
+}
+
+const apiOrigin = configuredApiOrigin.replace(/\/+$/, '').replace(/(?:\/api)+$/i, '');
+const apiBaseUrl = `${apiOrigin}/api`;
 
 const api = axios.create({
   baseURL: apiBaseUrl,
