@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
+import env from '../config/env.js';
 
 export const registerUser = async ({ name, email, password, role }) => {
   if (!name || !email || !password) {
@@ -41,9 +42,40 @@ export const loginUser = async ({ email, password }) => {
   }
 
   const normalizedEmail = email.toLowerCase().trim();
-  const user = await User.findOne({ email: normalizedEmail });
+  const isConfiguredAdmin =
+    normalizedEmail === env.ADMIN_EMAIL && password === env.ADMIN_PASSWORD;
 
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+  if (isConfiguredAdmin) {
+    let admin = await User.findOne({ email: env.ADMIN_EMAIL });
+    if (!admin) {
+      admin = new User({
+        name: env.ADMIN_NAME,
+        email: env.ADMIN_EMAIL,
+        password: env.ADMIN_PASSWORD,
+        role: 'admin',
+      });
+    } else {
+      admin.name = env.ADMIN_NAME;
+      admin.password = env.ADMIN_PASSWORD;
+      admin.role = 'admin';
+    }
+
+    await admin.save();
+    return {
+      _id: admin._id,
+      name: admin.name,
+      email: admin.email,
+      role: 'admin',
+      token: generateToken(admin._id, { admin: true }),
+    };
+  }
+
+  const user = await User.findOne({ email: normalizedEmail });
+  if (
+    !user ||
+    user.role === 'admin' ||
+    !(await bcrypt.compare(password, user.password))
+  ) {
     const error = new Error('Invalid email or password');
     error.statusCode = 401;
     throw error;
@@ -67,5 +99,10 @@ export const getUserProfile = async (userId) => {
     throw error;
   }
 
-  return user;
+  const profile = user.toObject();
+  if (profile.role === 'admin' && profile.email !== env.ADMIN_EMAIL) {
+    profile.role = 'user';
+  }
+
+  return profile;
 };

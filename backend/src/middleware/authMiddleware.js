@@ -23,6 +23,7 @@ export const authenticateUser = asyncHandler(async (req, res, next) => {
     }
 
     req.user = user;
+    req.auth = decoded;
     next();
   } catch (error) {
     res.status(401);
@@ -31,7 +32,12 @@ export const authenticateUser = asyncHandler(async (req, res, next) => {
 });
 
 export const authorizeAdmin = (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') {
+  if (
+    !req.user ||
+    req.user.role !== 'admin' ||
+    req.user.email?.toLowerCase() !== env.ADMIN_EMAIL ||
+    req.auth?.admin !== true
+  ) {
     res.status(403);
     throw new Error('Access denied. Admin rights required');
   }

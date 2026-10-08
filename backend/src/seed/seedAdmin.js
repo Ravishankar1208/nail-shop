@@ -4,22 +4,16 @@ import env from '../config/env.js';
 
 const seedAdmin = async () => {
   try {
-    const password = process.env.ADMIN_PASSWORD?.trim();
-    if (!password) {
-      throw new Error('ADMIN_PASSWORD must be set before seeding an admin user.');
-    }
-
     await mongoose.connect(env.MONGO_URI);
 
-    const email = process.env.ADMIN_EMAIL?.trim() || 'admin@nailatelier.com';
-    const name = process.env.ADMIN_NAME || 'Nail Atelier Admin';
+    const { ADMIN_EMAIL: email, ADMIN_PASSWORD: password, ADMIN_NAME: name } = env;
 
-    let admin = await User.findOne({ email: email.toLowerCase() });
+    let admin = await User.findOne({ email });
 
     if (!admin) {
       admin = new User({
         name,
-        email: email.toLowerCase(),
+        email,
         password,
         role: 'admin',
       });

@@ -12,7 +12,10 @@ import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 const app = express();
 const allowedOrigins = new Set([
   env.CLIENT_URL,
-  'https://nail-shop-phi.vercel.app',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
 ]);
 
 app.use(
@@ -24,7 +27,7 @@ app.use(
 
       return callback(new Error('Origin not allowed by CORS'));
     },
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
   }),
 );

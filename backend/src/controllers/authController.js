@@ -19,6 +19,9 @@ export const login = asyncHandler(async (req, res) => {
 
 export const getMe = asyncHandler(async (req, res) => {
   const user = await getUserProfile(req.user._id);
+  if (user.role === 'admin' && req.auth?.admin !== true) {
+    user.role = 'user';
+  }
   res.json({
     success: true,
     user,

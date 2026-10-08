@@ -79,6 +79,32 @@ export const getOrderById = async (id, user) => {
 };
 
 export const updateOrderStatus = async (id, status, paymentStatus) => {
+  const validOrderStatuses = [
+    'pending',
+    'confirmed',
+    'processing',
+    'shipped',
+    'delivered',
+    'cancelled',
+  ];
+  const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
+
+  if (status !== undefined && !validOrderStatuses.includes(status)) {
+    const error = new Error('Invalid order status');
+    error.statusCode = 400;
+    throw error;
+  }
+  if (paymentStatus !== undefined && !validPaymentStatuses.includes(paymentStatus)) {
+    const error = new Error('Invalid payment status');
+    error.statusCode = 400;
+    throw error;
+  }
+  if (status === undefined && paymentStatus === undefined) {
+    const error = new Error('Provide an order status or payment status to update');
+    error.statusCode = 400;
+    throw error;
+  }
+
   const order = await Order.findById(id);
 
   if (!order) {
@@ -95,5 +121,7 @@ export const updateOrderStatus = async (id, status, paymentStatus) => {
   }
 
   await order.save();
-  return order.populate('user', 'name email');
+  return order
+    .populate('user', 'name email')
+    .then((updatedOrder) => updatedOrder.populate('items.product', 'name image'));
 };

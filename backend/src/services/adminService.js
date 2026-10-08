@@ -57,6 +57,7 @@ export const getAdminAllOrders = async () => {
   const orders = await Order.find({})
     .sort({ createdAt: -1 })
     .populate('user', 'name email')
-    .populate('items.product');
+    .populate('items.product', 'name image')
+    .lean();
   return orders;
 };

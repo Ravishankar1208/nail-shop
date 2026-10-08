@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ImageWithFallback from '../component/ImageWithFallback';
 import { getAdminOrders, updateAdminOrderStatus } from '../services/api';
 
@@ -26,32 +26,41 @@ function AdminOrders() {
   const [updatingId, setUpdatingId] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
-      setLoading(true);
-      setError('');
       const data = await getAdminOrders();
       setOrders(data);
+      setError('');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load orders.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [fetchOrders]);
+
+  const refreshOrders = () => {
+    setLoading(true);
+    fetchOrders();
+  };
 
   const handleStatusChange = async (orderId, newStatus, newPaymentStatus) => {
     try {
+      setError('');
       setUpdatingId(orderId);
       const updated = await updateAdminOrderStatus(orderId, newStatus, newPaymentStatus);
-      setOrders((current) =>
-        current.map((order) => (order._id === orderId ? { ...order, ...updated } : order)),
-      );
+      const statusUpdates = {
+        orderStatus: updated.orderStatus,
+        paymentStatus: updated.paymentStatus,
+      };
+      setOrders((current) => current.map((order) =>
+        order._id === orderId ? { ...order, ...statusUpdates } : order,
+      ));
       if (selectedOrder && selectedOrder._id === orderId) {
-        setSelectedOrder((prev) => ({ ...prev, ...updated }));
+        setSelectedOrder((current) => ({ ...current, ...statusUpdates }));
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update order status.');
@@ -73,7 +82,15 @@ function AdminOrders() {
           <h1>Order Management</h1>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className="admin-btn admin-btn-secondary"
+            onClick={refreshOrders}
+            disabled={loading || updatingId !== null}
+          >
+            Refresh Orders
+          </button>
           <label style={{ fontSize: '0.9rem', color: '#5d4d4d', fontWeight: 600 }}>Filter:</label>
           <select
             value={filterStatus}
@@ -109,6 +126,7 @@ function AdminOrders() {
               <tr>
                 <th>Order ID</th>
                 <th>Customer</th>
+                <th>Items</th>
                 <th>Date</th>
                 <th>Total</th>
                 <th>Payment</th>
@@ -130,7 +148,8 @@ function AdminOrders() {
                       </small>
                     </div>
                   </td>
-                  <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                  <td>{order.items?.length || 0}</td>
+                  <td>{new Date(order.createdAt).toLocaleString()}</td>
                   <td>
                     <strong>₹{order.totalAmount}</strong>
                   </td>
@@ -264,6 +283,12 @@ function AdminOrders() {
                   </p>
                   <p style={{ margin: '0.2rem 0 0', fontSize: '0.86rem', color: '#5d4d4d' }}>
                     Method: {(selectedOrder.paymentMethod || 'COD').toUpperCase()}
+                  </p>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.86rem', color: '#5d4d4d' }}>
+                    Order status: {selectedOrder.orderStatus || 'pending'}
+                  </p>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.86rem', color: '#5d4d4d' }}>
+                    Payment status: {selectedOrder.paymentStatus || 'pending'}
                   </p>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiOrigin = (import.meta.env.VITE_API_URL || 'https://nail-shop-y0hs.onrender.com')
+const apiOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:5000')
   .replace(/\/+$/, '');
 const apiBaseUrl = apiOrigin.endsWith('/api') ? apiOrigin : `${apiOrigin}/api`;
 

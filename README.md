@@ -27,4 +27,4 @@ The backend uses a local `.env` file with:
 
 The frontend uses this API origin; the API service appends `/api`:
 
-- VITE_API_URL=https://nail-shop-y0hs.onrender.com
+- VITE_API_URL=http://localhost:5000

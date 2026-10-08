@@ -14,10 +14,6 @@ function AdminLogin() {
     return <Navigate to={location.state?.from || '/admin'} replace />;
   }
 
-  if (isAuthenticated && user && user.role !== 'admin') {
-    return <Navigate to="/" replace />;
-  }
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((current) => ({ ...current, [name]: value }));
@@ -35,7 +31,7 @@ function AdminLogin() {
         throw new Error('This account does not have admin access.');
       }
 
-      navigate('/admin', { replace: true });
+      navigate(location.state?.from || '/admin', { replace: true });
     } catch (loginError) {
       setError(loginError.response?.data?.message || loginError.message || 'Admin login failed.');
     } finally {
@@ -48,7 +44,7 @@ function AdminLogin() {
       <div className="auth-card">
         <p className="eyebrow">Admin access</p>
         <h1>Admin Login</h1>
-        <p>Use the secure administrator account to manage the store.</p>
+        <p>Enter the administrator credentials to manage the store.</p>
         <form onSubmit={handleSubmit} className="auth-form">
           <label>
             Email
